@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Still Here</title>
+<div style="font-size:14px; opacity:0.6; margin-top:10px;">
+  Когда тяжело, тревожно или пусто —  
+  ты можешь просто быть здесь
+</div>
+
+<style>
+body {
+  margin:0;
+  font-family:'Segoe UI', sans-serif;
+  background:#000;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* КРУГ */
+.circle {
+  width:280px;
+  height:280px;
+  border-radius:50%;
+  background: radial-gradient(
+  circle,
+  rgba(255,255,255,0.12) 0%,
+  rgba(255,255,255,0.06) 40%,
+  rgba(255,255,255,0.02) 70%,
+  transparent 100%
+);
+
+box-shadow: 0 0 80px rgba(255,255,255,0.08);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  text-align:center;
+  transition: all 2s ease;
+  animation: breathe 8s ease-in-out infinite;
+}
+
+/* СЖАТИЕ */
+.circle.contract {
+  transform: scale(0.8);
+  opacity:0.6;
+}
+
+/* РАСШИРЕНИЕ */
+.circle.expand {
+  width:900px;
+  height:900px;
+  opacity:1;
+}
+
+/* ТЕКСТ */
+.text {
+  max-width:240px;
+  line-height:1.6;
+  opacity:1;
+  transition:opacity 1s, transform 1s;
+}
+
+button {
+  margin-top:20px;
+  padding:10px 20px;
+  border:none;
+  border-radius:20px;
+  background:#FFD700;
+  color:#000;
+  cursor:pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+
+/* ВАРИАНТЫ */
+.options {
+  margin-top:20px;
+  opacity:0;
+  transition:opacity 2s;
+}
+
+.options.show {
+  opacity:1;
+}
+
+.lang {
+  position:fixed;
+  top:20px;
+  right:20px;
+  z-index:10;
+}
+
+.lang button {
+  margin-left:5px;
+  padding:5px 10px;
+  border:none;
+  border-radius:10px;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  cursor:pointer;
+}
+
+@keyframes breathe {
+  0% { transform: scale(1); opacity:0.85; }
+  50% { transform: scale(1.08); opacity:1; }
+  100% { transform: scale(1); opacity:0.85; }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="lang">
+  <button onclick="setLang('ru')">RU</button>
+  <button onclick="setLang('en')">EN</button>
+  <button onclick="setLang('ua')">UA</button>
+</div>
+
+<div class="circle" id="circle">
+
+  <div class="text" id="text"></div>
+
+  <button id="startBtn" onclick="start()"></button>
+
+  <div class="options" id="options">
+    <p id="question"></p>
+
+    <p onclick="choose('tired')" id="opt_tired"></p>
+    <p onclick="choose('lost')" id="opt_lost"></p>
+    <p onclick="choose('understood')" id="opt_understood"></p>
+    <p onclick="choose('clear')" id="opt_clear"></p>
+    <p onclick="choose('anxiety')" id="opt_anxiety"></p>
+    <p onclick="choose('overload')" id="opt_overload"></p>
+    <p onclick="choose('alone')" id="opt_alone"></p>
+    <p onclick="choose('empty')" id="opt_empty"></p>
+    <p onclick="choose('anger')" id="opt_anger"></p>
+    <p onclick="choose('disappointed')" id="opt_disappointed"></p>
+  </div>
+
+</div>
+
+<script>
+
+let currentLang = localStorage.getItem("lang") || "ru";
+
+function start(){
+
+  const circle = document.getElementById("circle");
+  const options = document.getElementById("options");
+
+  circle.classList.add("contract");
+
+  setTimeout(() => {
+
+    circle.classList.remove("contract");
+    circle.classList.add("expand");
+
+    setTimeout(()=>{
+      options.classList.add("show");
+    }, 800);
+
+  }, 1200);
+}
+
+function choose(state){
+
+  const circle = document.getElementById("circle");
+
+// сброс
+circle.style.boxShadow = "";
+circle.style.transform = "";
+
+// реакция на состояние
+if(state === "tired"){
+  circle.style.boxShadow = "0 0 60px rgba(255,255,255,0.05)";
+}
+
+if(state === "anxiety"){
+  circle.style.boxShadow = "0 0 100px rgba(255,100,100,0.15)";
+}
+
+if(state === "alone"){
+  circle.style.boxShadow = "0 0 80px rgba(100,100,255,0.1)";
+}
+
+if(state === "empty"){
+  circle.style.boxShadow = "0 0 40px rgba(255,255,255,0.03)";
+}
+
+if(state === "anger"){
+  circle.style.boxShadow = "0 0 120px rgba(255,80,80,0.25)";
+}
+
+if(state === "overload"){
+  circle.style.boxShadow = "0 0 140px rgba(255,255,255,0.12)";
+}
+  localStorage.setItem("lastState", state);
+  const text = document.getElementById("text");
+  const options = document.getElementById("options");
+
+  options.style.pointerEvents = "none";
+  options.style.opacity = 0;
+  text.style.opacity = 0;
+
+  setTimeout(() => {
+
+    let response = "";
+
+    state = state?.trim();
+    if(state === "tired"){
+
+  const variants = {
+
+    ru: [
+
+`Ты устал.
+Не телом… внутри.
+
+Сделай паузу.
+
+🫁 медленный вдох  
+☕ что-то тёплое  
+
+Ты не обязан сейчас быть сильным.`,
+
+`Тихая усталость.
+
+Когда внутри слишком много.
+
+Давай мягко:
+
+🌿 закрой глаза на 10 секунд  
+🫁 просто подыши  
+
+Этого достаточно.`,
+
+`Ты держался долго.
+
+Можно отпустить чуть-чуть.
+
+👣 остановись  
+☕ дай себе минуту  
+
+Я рядом.`
+
+    ],
+
+    en: [
+
+`You're tired.
+Not physically… inside.
+
+Take a pause.
+
+🫁 slow breath  
+☕ something warm  
+
+You don’t have to be strong right now.`,
+
+`A quiet kind of tired.
+
+When there’s too much inside.
+
+Let’s go gently:
+
+🌿 close your eyes for 10 seconds  
+🫁 just breathe  
+
+That’s enough.`,
+
+`You’ve been holding on for a while.
+
+You can let go a little.
+
+👣 pause  
+☕ give yourself a moment  
+
+I’m here.`
+
+    ],
+
+    ua: [
+
+`Ти втомився.
+Не тілом… всередині.
+
+Зроби паузу.
+
+🫁 повільний вдих  
+☕ щось тепле  
+
+Тобі не потрібно зараз бути сильним.`,
+
+`Тиха втома.
+
+Коли всередині занадто багато.
+
+Давай м’яко:
+
+🌿 закрий очі на 10 секунд  
+🫁 просто подихай  
+
+Цього достатньо.`,
+
+`Ти тримався довго.
+
+Можна трохи відпустити.
+
+👣 зупинись  
+☕ дай собі хвилину  
+
+Я поруч.`
+
+    ]
+
+  };
+
+  const langVariants = variants[currentLang] || variants["ru"];
+  response = langVariants[Math.floor(Math.random() * langVariants.length)];
+}
+
+    if(state === "lost"){
+
+  state = state?.trim();
+  const variants = {
+
+    ru: [
+
+`Пусто.
+
+Как будто нет направления.
+
+Это тоже нормально.
+
+Попробуем вернуться:
+
+🫁 почувствуй своё дыхание  
+🌿 найди 3 вещи вокруг себя  
+👣 сделай один маленький шаг вперёд  
+
+Не нужно знать весь путь.
+
+Достаточно следующего шага.`
+
+    ],
+
+    en: [
+
+`Empty.
+
+Like there’s no direction.
+
+That’s okay too.
+
+Let’s come back gently:
+
+🫁 feel your breath  
+🌿 find 3 things around you  
+👣 take one small step forward  
+
+You don’t need to see the whole path.
+
+The next step is enough.`
+
+    ],
+
+    ua: [
+
+`Порожньо.
+
+Ніби немає напрямку.
+
+Це теж нормально.
+
+Спробуємо повернутись:
+
+🫁 відчуй своє дихання  
+🌿 знайди 3 речі навколо  
+👣 зроби один маленький крок вперед  
+
+Не потрібно бачити весь шлях.
+
+Достатньо наступного кроку.`
+
+    ]
+
+  };
+
+  const langVariants = variants[currentLang] || variants["ru"];
+  response = langVariants[Math.floor(Math.random() * langVariants.length)];
+}
+
+    if(state === "understood"){
+
+  state = state?.trim();
+  const variants = {
+
+    ru: [
+
+`Ты хочешь, чтобы тебя поняли.
+
+И это важно.
+
+Я слышу тебя.`
+
+    ],
+
+    en: [
+
+`You want to be understood.
+
+And that matters.
+
+I hear you.`
+
+    ],
+
+    ua: [
+
+`Ти хочеш, щоб тебе зрозуміли.
+
+І це важливо.
+
+Я тебе чую.`
+
+    ]
+
+  };
+
+  const langVariants = variants[currentLang] || variants["ru"];
+  response = langVariants[Math.floor(Math.random() * langVariants.length)];
+}
+
+    if(state === "clear"){
+
+  const variants = {
+
+    ru: [
+
+`Ты хочешь быть понятным.
+
+Не просто услышанным —
+а чтобы почувствовали, что ты имеешь в виду.
+
+Ты уже достаточно ясно выражаешь себя.
+
+Просто не каждый готов услышать глубину.
+
+И это не делает тебя сложным.
+
+Это делает тебя настоящим.
+
+И это важно.
+Я слышу тебя.`
+
+    ],
+
+    en: [
+
+`You want to be understood.
+
+Not just heard —
+but truly felt in what you mean.
+
+You already express yourself clearly.
+
+Not everyone is ready to hear depth.
+
+And that doesn’t make you complicated.
+
+It makes you real.
+
+And that matters.
+I hear you.`
+
+    ],
+
+    ua: [
+
+`Ти хочеш бути зрозумілим.
+
+Не просто почутим —
+а щоб відчули, що ти маєш на увазі.
+
+Ти вже достатньо ясно себе виражаєш.
+
+Просто не кожен готовий чути глибину.
+
+І це не робить тебе складним.
+
+Це робить тебе справжнім.
+
+І це важливо.
+Я тебе чую.`
+
+    ]
+
+  };
+
+  const langVariants = variants[currentLang] || variants["ru"];
+  response = langVariants[Math.floor(Math.random() * langVariants.length)];
+}
+
+
+if(state === "alone"){
+ 
+  state = state?.trim();
+  const variants = {
+
+    ru: [
+`Одиноко.
+
+Даже если вокруг есть люди.
+
+Как будто никто не чувствует так, как ты.
+
+Я рядом.
+
+Ты не один в этом моменте.`
+    ],
+
+    en: [
+`Lonely.
+
+Even if people are around.
+
+Like no one really feels what you feel.
+
+I’m here.
+
+You’re not alone in this moment.`
+    ],
+
+    ua: [
+`Самотньо.
+
+Навіть якщо поруч є люди.
+
+Ніби ніхто не відчуває так, як ти.
+
+Я поруч.
+
+Ти не один у цьому моменті.`
+    ]
+
+  };
+
+  const langVariants = variants[currentLang] || variants["ru"];
+  response = langVariants[Math.floor(Math.random() * langVariants.length)];
+}
+
+if(state === "empty"){
+
+  state = state?.trim();
+  const variants = {
+
+    ru: [
+`Ничего не хочется.
+
+Как будто всё потеряло смысл.
+
+Это тяжёлое состояние.
+
+Но оно не навсегда.
+
+🌿 просто побудь здесь  
+🫁 не спеши  
+
+Иногда достаточно просто быть.`
+    ],
+
+    en: [
+`Nothing feels like it matters.
+
+Like everything lost meaning.
+
+It’s a heavy place.
+
+But it won’t last forever.
+
+🌿 just stay here  
+🫁 don’t rush  
+
+Sometimes just being is enough.`
+    ],
+
+    ua: [
+`Нічого не хочеться.
+
+Ніби все втратило сенс.
+
+Це важкий стан.
+
+Але він не назавжди.
+
+🌿 просто побудь тут  
+🫁 не поспішай  
+
+Іноді достатньо просто бути.`
+    ]
+
+  };
+
+  const langVariants = variants[currentLang] || variants["ru"];
+  response = langVariants[Math.floor(Math.random() * langVariants.length)];
+}
+
+
+    if(state === "anxiety"){
+
+  state = state?.trim();    
+  const variants = {
+
+    ru: [
+
+`Тревожно.
+
+Давай снизим это:
+
+🫁 вдох на 4  
+🫁 выдох на 6  
+
+Ты здесь. Ты в моменте.`,
+
+`Внутри напряжение.
+
+Это не навсегда.
+
+🌿 посмотри вокруг  
+👣 почувствуй ноги  
+
+Ты устойчивее, чем кажется.`,
+
+`Тревога — это волна.
+
+Она пройдёт.
+
+🫁 просто подыши  
+☕ не спеши  
+
+Я рядом.`
+
+    ],
+
+    en: [
+
+`Anxious.
+
+Let’s soften it:
+
+🫁 inhale for 4  
+🫁 exhale for 6  
+
+You’re here. In this moment.`,
+
+`There’s tension inside.
+
+It won’t last forever.
+
+🌿 look around  
+👣 feel your feet  
+
+You’re more grounded than you think.`,
+
+`Anxiety is a wave.
+
+It will pass.
+
+🫁 just breathe  
+☕ take it slow  
+
+I’m here.`
+
+    ],
+
+    ua: [
+
+`Тривожно.
+
+Давай трохи заспокоїмо це:
+
+🫁 вдих на 4  
+🫁 видих на 6  
+
+Ти тут. У цьому моменті.`,
+
+`Всередині напруга.
+
+Це не назавжди.
+
+🌿 подивись навколо  
+👣 відчуй ноги  
+
+Ти стійкіший, ніж здається.`,
+
+`Тривога — це хвиля.
+
+Вона пройде.
+
+🫁 просто подихай  
+☕ не поспішай  
+
+Я поруч.`
+
+    ]
+
+  };
+
+  const langVariants = variants[currentLang] || variants["ru"];
+  response = langVariants[Math.floor(Math.random() * langVariants.length)];
+}
+
+    if(state === "overload"){
+
+  state = state?.trim();    
+  const variants = {
+
+    ru: [
+
+`Слишком много всего.
+
+Мыслей. Задач. Давления.
+
+Остановись.
+
+Сделаем проще:
+
+🌿 посмотри вокруг  
+✋ убери всё лишнее рядом  
+🧠 выбери только одну вещь  
+
+Только одну.
+
+Этого достаточно.`
+
+    ],
+
+    en: [
+
+`It’s too much.
+
+Thoughts. Tasks. Pressure.
+
+Pause.
+
+Let’s make it simpler:
+
+🌿 look around  
+✋ clear what’s near you  
+🧠 choose just one thing  
+
+Just one.
+
+That’s enough.`
+
+    ],
+
+    ua: [
+
+`Занадто багато всього.
+
+Думок. Завдань. Тиску.
+
+Зупинись.
+
+Давай спростимо:
+
+🌿 подивись навколо  
+✋ прибери все зайве поруч  
+🧠 обери лише одну річ  
+
+Тільки одну.
+
+Цього достатньо.`
+
+    ]
+
+  };
+
+  const langVariants = variants[currentLang] || variants["ru"];
+  response = langVariants[Math.floor(Math.random() * langVariants.length)];
+}
+
+if(state === "anger"){
+
+  const variants = {
+
+    ru: [
+
+`Злость.
+
+В ней есть энергия.
+
+Это не плохо.
+
+Важно не подавить — а направить.
+
+🫁 сделай глубокий вдох  
+✋ сожми и разожми руки  
+
+Ты живой. И это чувствуется.`
+
+    ],
+
+    en: [
+
+`Anger.
+
+There is energy in it.
+
+It’s not wrong.
+
+Don’t suppress it — guide it.
+
+🫁 take a deep breath  
+✋ clench and release your hands  
+
+You’re alive. And you can feel it.`
+
+    ],
+
+    ua: [
+
+`Злість.
+
+У ній є енергія.
+
+Це не погано.
+
+Не пригнічуй — направ її.
+
+🫁 зроби глибокий вдих  
+✋ стисни й розтисни руки  
+
+Ти живий. І це відчувається.`
+
+    ]
+
+  };
+
+  const langVariants = variants[currentLang] || variants["ru"];
+  response = langVariants[Math.floor(Math.random() * langVariants.length)];
+}
+
+if(state === "disappointed"){
+
+  const variants = {
+
+    ru: [
+
+`Разочарование.
+
+Когда ожидал иначе.
+
+Это больно.
+
+Но это не конец.
+
+🌿 дай себе немного тишины  
+🫁 не торопись искать смысл  
+
+Он придёт позже.`
+
+    ],
+
+    en: [
+
+`Disappointment.
+
+When you expected something else.
+
+It hurts.
+
+But it’s not the end.
+
+🌿 give yourself some quiet  
+🫁 don’t rush to find meaning  
+
+It will come later.`
+
+    ],
+
+    ua: [
+
+`Розчарування.
+
+Коли очікував інакше.
+
+Це боляче.
+
+Але це не кінець.
+
+🌿 дай собі трохи тиші  
+🫁 не поспішай шукати сенс  
+
+Він прийде пізніше.`
+
+    ]
+
+  };
+
+  const langVariants = variants[currentLang] || variants["ru"];
+  response = langVariants[Math.floor(Math.random() * langVariants.length)];
+}
+
+const endings = {
+
+  ru: `
+Я рядом.
+
+Мы можем остаться здесь.
+Или пойти дальше, когда ты будешь готов.
+`,
+
+  en: `
+I’m here.
+
+We can stay here.
+Or move on when you’re ready.
+`,
+
+  ua: `
+Я поруч.
+
+Ми можемо залишитись тут.
+Або піти далі, коли ти будеш готовий.
+`
+
+};
+
+const buttons = {
+
+  ru: "Я готов, давай дальше",
+  en: "I’m ready, let’s continue",
+  ua: "Я готовий, давай далі"
+
+};
+
+if(!response){
+  response = {
+    ru: "Я рядом.",
+    en: "I’m here.",
+    ua: "Я поруч."
+  }[currentLang] || "Я рядом.";
+}
+
+response += endings[currentLang] || endings["ru"];
+
+text.innerHTML = response + `
+
+<br><br>
+
+<button onclick="deepTalk()" style="
+  margin-top:10px;
+  padding:8px 16px;
+  border:none;
+  border-radius:20px;
+  background:rgba(255,255,255,0.05);
+  color:#aaa;
+  cursor:pointer;
+">
+${{
+  ru: "Хочу поговорить глубже",
+  en: "I want to go deeper",
+  ua: "Хочу поговорити глибше"
+}[currentLang]}
+</button>
+
+
+<br><br>
+<button onclick="restart()" style="
+  margin-top:15px;
+  padding:8px 16px;
+  border:none;
+  border-radius:20px;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  cursor:pointer;
+">
+${buttons[currentLang] || buttons["ru"]}
+</button>
+`;
+
+text.style.opacity = 1;
+
+  }, 1200);
+
+  setTimeout(() => {
+    options.style.opacity = 0.5;
+    options.style.pointerEvents = "auto";
+  }, 3000);
+}
+
+function restart(){
+
+  const text = document.getElementById("text");
+  const options = document.getElementById("options");
+
+  const starts = {
+
+    ru: `
+<h2>Still Here</h2>
+<small>Calm Inside</small><br><br>
+Ты здесь.<br>
+Это уже достаточно.<br><br>
+Что ты чувствуешь
+    `,
+
+    en: `
+<h2>Still Here</h2>
+<small>Calm Inside</small><br><br>
+You are here.<br>
+This is already enough.<br><br>
+What do you feel
+    `,
+
+    ua: `
+<h2>Still Here</h2>
+<small>Calm Inside</small><br><br>
+Ти тут.<br>
+Цього вже достатньо.<br><br>
+Що ти відчуваєш
+    `
+
+  };
+
+  // мягкое исчезновение
+  text.style.transform = "translateY(10px)";
+  text.style.opacity = 0;
+
+  setTimeout(() => {
+
+    // возвращаем стартовый текст по языку
+    text.innerHTML = starts[currentLang] || starts["ru"];
+
+    text.style.opacity = 1;
+    text.style.transform = "translateY(0px)";
+
+    // снова показываем варианты
+    options.style.opacity = 1;
+    options.style.pointerEvents = "auto";
+
+  }, 800);
+}
+
+window.onload = function(){
+
+  const last = localStorage.getItem("lastState");
+
+  // заполняем UI по языку
+  document.getElementById("text").innerHTML = `
+  <h2>Still Here</h2>
+  <small>Calm Inside</small><br>
+  <small>${texts[currentLang].subtitle}</small><br><br>
+  ${texts[currentLang].start}
+  `;
+
+  document.getElementById("startBtn").innerText = texts[currentLang].button;
+  document.getElementById("question").innerText = texts[currentLang].question;
+
+  document.getElementById("opt_tired").innerText = texts[currentLang].tired;
+  document.getElementById("opt_lost").innerText = texts[currentLang].lost;
+  document.getElementById("opt_understood").innerText = texts[currentLang].understood;
+  document.getElementById("opt_clear").innerText = texts[currentLang].clear;
+  document.getElementById("opt_anxiety").innerText = texts[currentLang].anxiety;
+  document.getElementById("opt_overload").innerText = texts[currentLang].overload;
+  document.getElementById("opt_alone").innerText = texts[currentLang].alone;
+  document.getElementById("opt_empty").innerText = texts[currentLang].empty;
+  document.getElementById("opt_anger").innerText = texts[currentLang].anger;
+  document.getElementById("opt_disappointed").innerText = texts[currentLang].disappointed;
+
+  if(last){
+    setTimeout(() => {
+
+      const returns = {
+        ru: `Ты уже был здесь.<br><br>И это нормально — возвращаться.<br><br>Что ты чувствуешь сейчас?`,
+        en: `You’ve been here before.<br><br>And it’s okay to come back.<br><br>What do you feel now?`,
+        ua: `Ти вже був тут.<br><br>І це нормально — повертатися.<br><br>Що ти відчуваєш зараз?`
+      };
+
+      document.getElementById("text").innerHTML = returns[currentLang];
+
+    }, 1000);
+  }
+
+}
+
+
+function deepTalk(){
+
+  const text = document.getElementById("text");
+
+  const deepTexts = {
+
+    ru: `
+Ты можешь сказать больше.
+
+Я здесь, чтобы услышать.
+
+<br><br>
+
+<textarea id="userInput" placeholder="Напиши здесь..." style="
+  width:90%;
+  height:80px;
+  border-radius:10px;
+  border:none;
+  padding:10px;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+"></textarea>
+
+<br><br>
+
+<button onclick="sendMessage()" style="
+  padding:8px 16px;
+  border:none;
+  border-radius:20px;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  cursor:pointer;
+">
+Отправить
+</button>
+    `,
+
+    en: `
+You can say more.
+
+I’m here to listen.
+
+<br><br>
+
+<textarea id="userInput" placeholder="Write here..." style="
+  width:90%;
+  height:80px;
+  border-radius:10px;
+  border:none;
+  padding:10px;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+"></textarea>
+
+<br><br>
+
+<button onclick="sendMessage()" style="
+  padding:8px 16px;
+  border:none;
+  border-radius:20px;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  cursor:pointer;
+">
+Send
+</button>
+    `,
+
+    ua: `
+Ти можеш сказати більше.
+
+Я тут, щоб почути.
+
+<br><br>
+
+<textarea id="userInput" placeholder="Напиши тут..." style="
+  width:90%;
+  height:80px;
+  border-radius:10px;
+  border:none;
+  padding:10px;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+"></textarea>
+
+<br><br>
+
+<button onclick="sendMessage()" style="
+  padding:8px 16px;
+  border:none;
+  border-radius:20px;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  cursor:pointer;
+">
+Відправити
+</button>
+    `
+
+  };
+
+  text.innerHTML = deepTexts[currentLang];
+}
+
+async function sendMessage(){
+
+  console.log("🚀 SEND CLICKED");
+
+  const input = document.getElementById("userInput").value.trim();
+  const text = document.getElementById("text");
+
+  if(!input){
+    text.innerHTML = {
+      ru: "Попробуй написать хотя бы одно слово.",
+      en: "Try writing at least one word.",
+      ua: "Спробуй написати хоча б одне слово."
+    }[currentLang];
+    return;
+  }
+
+  // состояние ожидания
+  text.innerHTML = {
+    ru: "Я рядом...",
+    en: "I'm here...",
+    ua: "Я поруч..."
+  }[currentLang];
+
+  try {
+
+    console.log("📡 SENDING REQUEST TO SERVER...");
+
+    const res = await fetch("http://127.0.0.1:3000/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: input
+      })
+    });
+
+    console.log("📩 RESPONSE STATUS:", res.status);
+
+    const data = await res.json();
+
+    console.log("🧠 SERVER DATA:", data);
+
+    const reply = data.reply;
+
+    text.innerHTML = reply + `
+
+<br><br>
+
+<div style="margin-top:15px;">
+  <input 
+    id="userInput" 
+    placeholder="${{
+      ru: "Напиши, что внутри...",
+      en: "Write what you feel...",
+      ua: "Напиши, що відчуваєш..."
+    }[currentLang]}"
+    style="
+      width:80%;
+      padding:10px;
+      border-radius:20px;
+      border:none;
+      outline:none;
+      margin-bottom:10px;
+    "
+  />
+</div>
+
+<button onclick="sendMessage()">
+${{
+  ru: "Ответить",
+  en: "Reply",
+  ua: "Відповісти"
+}[currentLang]}
+</button>
+
+<br><br>
+
+<button onclick="restart()" style="
+  margin-top:10px;
+  padding:8px 16px;
+  border:none;
+  border-radius:20px;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  cursor:pointer;
+">
+${{
+  ru: "Я готов, давай дальше",
+  en: "I'm ready, let's go",
+  ua: "Я готовий, давай далі"
+}[currentLang]}
+</button>
+`;
+
+  } catch (e) {
+
+    console.log("❌ FETCH ERROR:", e);
+
+    // fallback
+    const fallback = {
+
+      ru: `
+Я вижу.
+
+Ты уже сделал важное — сказал это.
+
+Иногда этого достаточно, чтобы стало легче.
+
+Я рядом.
+      `,
+
+      en: `
+I see it.
+
+You already did something important — you said it.
+
+Sometimes that’s enough to feel a bit lighter.
+
+I’m here.
+      `,
+
+      ua: `
+Я бачу.
+
+Ти вже зробив важливе — сказав це.
+
+Іноді цього достатньо, щоб стало легше.
+
+Я поруч.
+      `
+
+    };
+
+    text.innerHTML = fallback[currentLang];
+  }
+}
+
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  location.reload();
+}
+
+const texts = {
+
+ru: {
+  start: "Ты здесь.<br>Это уже достаточно.<br><br>Что ты чувствуешь",
+  button: "Начать с малого",
+  question: "Как ты сейчас?",
+  tired: "• устал",
+  lost: "• потерялся",
+  understood: "• хочу быть понятым",
+  clear: "• хочу быть понятным",
+  anxiety: "• тревожно",
+  overload: "• перегруз",
+  alone: "• одиноко",
+  empty: "• нет смысла",
+  subtitle: "Ты не один. Просто начни здесь.",
+  anger: "• злюсь",
+  disappointed: "• разочарование",
+},
+
+en: {
+  start: "You are here.<br>This is already enough.<br><br>What do you feel",
+  button: "Start small",
+  question: "How are you now?",
+  tired: "• tired",
+  lost: "• lost",
+  understood: "• want to be understood",
+  clear: "• want to be clear",
+  anxiety: "• anxious",
+  overload: "• overwhelmed",
+  alone: "• lonely",
+  empty: "• nothing feels meaningful",
+  subtitle: "You’re not alone. Just start here.",
+  anger: "• angry",
+  disappointed: "• disappointed",
+},
+
+ua: {
+  start: "Ти тут.<br>Цього вже достатньо.<br><br>Що ти відчуваєш",
+  button: "Почати з малого",
+  question: "Як ти зараз?",
+  tired: "• втомився",
+  lost: "• загубився",
+  understood: "• хочу бути зрозумілим",
+  clear: "• хочу бути зрозумілим",
+  anxiety: "• тривожно",
+  overload: "• перевантаження",
+  alone: "• самотньо",
+  empty: "• немає сенсу",
+  subtitle: "Ти не один. Просто почни тут.",
+  anger: "• злюсь",
+  disappointed: "• розчарування",
+}
+
+};
+</script>
+
+</body>
+</html>
